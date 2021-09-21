@@ -8,12 +8,14 @@ const useStyles = makeStyles(() => ({
   root: {
     display: "flex",
     flexGrow: 8,
-    flexDirection: "column"
+    flexDirection: "column",
+    height: '100%',
   },
   chatContainer: {
     marginLeft: 41,
     marginRight: 41,
     display: "flex",
+    overflowY: 'hidden',
     flexDirection: "column",
     flexGrow: 1,
     justifyContent: "space-between"
