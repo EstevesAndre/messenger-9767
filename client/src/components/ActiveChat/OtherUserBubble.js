@@ -16,7 +16,8 @@ const useStyles = makeStyles(() => ({
     fontSize: 11,
     color: "#BECCE2",
     fontWeight: "bold",
-    marginBottom: 5
+    marginBottom: 5,
+    textTransform: 'capitalize'
   },
   bubble: {
     backgroundImage: "linear-gradient(225deg, #6CC1FF 0%, #3A8DFF 100%)",

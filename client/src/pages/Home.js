@@ -1,10 +1,10 @@
 import React, { useEffect, useState } from "react";
 import { Redirect } from "react-router-dom";
 import { connect } from "react-redux";
-import { Grid, CssBaseline, Button } from "@material-ui/core";
+import { Grid, CssBaseline } from "@material-ui/core";
 import { makeStyles } from "@material-ui/core/styles";
-import { SidebarContainer } from "./Sidebar";
-import { ActiveChat } from "./ActiveChat";
+import { SidebarContainer } from "../components/Sidebar";
+import { ActiveChat } from "../components/ActiveChat";
 import { logout, fetchConversations } from "../store/utils/thunkCreators";
 import { clearOnLogout } from "../store/index";
 
@@ -40,17 +40,11 @@ const Home = (props) => {
   };
 
   return (
-    <>
-      {/* logout button will eventually be in a dropdown next to username */}
-      <Button className={classes.logout} onClick={handleLogout}>
-        Logout
-      </Button>
-      <Grid container component="main" className={classes.root}>
-        <CssBaseline />
-        <SidebarContainer />
-        <ActiveChat />
-      </Grid>
-    </>
+    <Grid container component="main" className={classes.root}>
+      <CssBaseline />
+      <SidebarContainer handleLogout={handleLogout} />
+      <ActiveChat />
+    </Grid>
   );
 };
 
