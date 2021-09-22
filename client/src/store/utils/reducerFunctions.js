@@ -13,11 +13,13 @@ export const addMessageToStore = (state, payload) => {
 
   // Add updated conversation to the start of the array
   // If we use push it will be added to the end of the array -> last element of chat users
-  state.unshift(
-    state.splice(
-      state.findIndex(a => a.id === message.conversationId),
-      1)[0]
-  );
+  // It it is at the start, it is not necessary to update the order
+  if (state[0].id !== message.conversationId)
+    state.unshift(
+      state.splice(
+        state.findIndex(a => a.id === message.conversationId),
+        1)[0]
+    );
 
   return state
     .map((convo) => {
@@ -79,11 +81,13 @@ export const addSearchedUsersToStore = (state, users) => {
 export const addNewConvoToStore = (state, recipientId, message) => {
 
   // Add updated conversation to the end of the array
-  state.unshift(
-    state.splice(
-      state.findIndex(a => a.otherUser.id === recipientId),
-      1)[0]
-  );
+  // It it is at the start, it is not necessary to update the order
+  if (state[0].otherUser.id !== recipientId)
+    state.unshift(
+      state.splice(
+        state.findIndex(a => a.otherUser.id === recipientId),
+        1)[0]
+    );
 
   return state
     .map((convo) => {
