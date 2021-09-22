@@ -11,27 +11,19 @@ export const addMessageToStore = (state, payload) => {
     return [newConvo, ...state];
   }
 
-  // Add updated conversation to the start of the array
-  // If we use push it will be added to the end of the array -> last element of chat users
-  // It it is at the start, it is not necessary to update the order
-  if (state[0].id !== message.conversationId)
-    state.unshift(
-      state.splice(
-        state.findIndex(a => a.id === message.conversationId),
-        1)[0]
-    );
-
-  return state
-    .map((convo) => {
-      if (convo.id === message.conversationId) {
-        const convoCopy = { ...convo };
-        convoCopy.messages.push(message);
-        convoCopy.latestMessageText = message.text;
-        return convoCopy;
-      } else {
-        return convo;
-      }
-    });
+  return [
+    state.splice(state.findIndex(a => a.id === message.conversationId), 1)[0],
+    ...state
+  ].map((convo) => {
+    if (convo.id === message.conversationId) {
+      const convoCopy = { ...convo };
+      convoCopy.messages.push(message);
+      convoCopy.latestMessageText = message.text;
+      return convoCopy;
+    } else {
+      return convo;
+    }
+  });
 };
 
 export const addOnlineUserToStore = (state, id) => {
@@ -81,24 +73,18 @@ export const addSearchedUsersToStore = (state, users) => {
 export const addNewConvoToStore = (state, recipientId, message) => {
 
   // Add updated conversation to the end of the array
-  // It it is at the start, it is not necessary to update the order
-  if (state[0].otherUser.id !== recipientId)
-    state.unshift(
-      state.splice(
-        state.findIndex(a => a.otherUser.id === recipientId),
-        1)[0]
-    );
-
-  return state
-    .map((convo) => {
-      if (convo.otherUser.id === recipientId) {
-        const convoCopy = { ...convo };
-        convoCopy.id = message.conversationId;
-        convoCopy.messages.push(message);
-        convoCopy.latestMessageText = message.text;
-        return convoCopy;
-      } else {
-        return convo;
-      }
-    });
+  return [
+    state.splice(state.findIndex(a => a.otherUser.id === recipientId), 1)[0],
+    ...state
+  ].map((convo) => {
+    if (convo.otherUser.id === recipientId) {
+      const convoCopy = { ...convo };
+      convoCopy.id = message.conversationId;
+      convoCopy.messages.push(message);
+      convoCopy.latestMessageText = message.text;
+      return convoCopy;
+    } else {
+      return convo;
+    }
+  });
 };
