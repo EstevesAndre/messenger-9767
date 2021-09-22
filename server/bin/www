@@ -43,6 +43,7 @@ io.on("connection", (socket) => {
   socket.on("new-message", (data) => {
     socket.broadcast.emit("new-message", {
       message: data.message,
+      recipientId: data.recipientId,
       sender: data.sender,
     });
   });
@@ -53,6 +54,14 @@ io.on("connection", (socket) => {
       onlineUsers.splice(userIndex, 1);
       socket.broadcast.emit("remove-offline-user", id);
     }
+  });
+
+  socket.on("conversation-read", (data) => {
+    socket.broadcast.emit("conversation-read", {
+      conversationId: data.conversationId,
+      messageId: data.messageId,
+      senderId: data.senderId
+    });
   });
 });
 
