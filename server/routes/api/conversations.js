@@ -98,4 +98,35 @@ router.get("/", async (req, res, next) => {
   }
 });
 
+// updates read conversation
+router.put("/read/:id", async (req, res, next) => {
+  try {
+    if (!req.user) {
+      return res.sendStatus(401);
+    }
+
+    const conversationId = req.params.id;
+
+    const conversation = await Conversation.findOne({
+      where: {
+        id: conversationId
+      },
+      attributes: ["id"],
+      include: [
+        { model: Message, limit: 1, order: [['createdAt', 'DESC']] }
+      ]
+    });
+
+    if (conversation.messages.length && !conversation.messages[0].isRead) {
+      conversation.messages[0].isRead = true;
+      // TODO remove
+      // conversation.messages[0].save();
+    }
+
+    return res.status(200).json(conversation.messages[0]);
+  } catch (error) {
+    next(error);
+  }
+});
+
 module.exports = router;
