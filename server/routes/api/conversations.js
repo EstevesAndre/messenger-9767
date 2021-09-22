@@ -3,6 +3,39 @@ const { User, Conversation, Message } = require("../../db/models");
 const { Op } = require("sequelize");
 const onlineUsers = require("../../onlineUsers");
 
+
+const getReadIds = (otherUserId, messages) => {
+
+  var senderRead = -1, userRead = -1;
+
+  const setUserReadValue = (j) => {
+    userRead = (userRead === -1 ? j : userRead);
+  };
+  const setSenderReadValue = (msgId) => {
+    senderRead = (senderRead === -1 ? msgId : senderRead);
+  };
+
+  // start from last to the beginning (more efficient)
+  for (var j = messages.length - 1; j >= 0; j--) {
+    const msgId = messages[j].id;
+
+    // Other user message
+    if (otherUserId === messages[j].senderId) {
+      if (messages[j].isRead) setUserReadValue(j);
+      setSenderReadValue(msgId);
+    }
+    // this user message
+    else {
+      if (messages[j].isRead) setSenderReadValue(msgId);
+      setUserReadValue(j);
+    }
+
+    if (senderRead !== -1 && userRead !== -1) break;
+  }
+
+  return { senderRead, userRead };
+};
+
 // get all conversations for a user, include latest message text for preview, and all messages
 // include other user model so we have info on username/profile pic (don't include current user info)
 router.get("/", async (req, res, next) => {
@@ -72,15 +105,7 @@ router.get("/", async (req, res, next) => {
       }
 
       // get index of the last message seen by each user
-      var senderRead = -1, userRead = -1;
-      for (var j = 0; j < convoJSON.messages.length; j++) {
-        const msgId = convoJSON.messages[j].id;
-        if (convoJSON.otherUser.id === convoJSON.messages[j].senderId) { // Other user message
-          convoJSON.messages[j].isRead ? userRead = j : senderRead = msgId;
-        } else { // this user message
-          convoJSON.messages[j].isRead ? senderRead = msgId : userRead = j;
-        }
-      }
+      const { senderRead, userRead } = getReadIds(convoJSON.otherUser.id, convoJSON.messages);
 
       convoJSON.readIds = {
         userMessagesToRead: userRead === -1 ? convoJSON.messages.length : convoJSON.messages.length - (userRead + 1),
@@ -119,8 +144,7 @@ router.put("/read/:id", async (req, res, next) => {
 
     if (conversation.messages.length && !conversation.messages[0].isRead) {
       conversation.messages[0].isRead = true;
-      // TODO remove
-      // conversation.messages[0].save();
+      conversation.messages[0].save();
     }
 
     return res.status(200).json(conversation.messages[0]);
