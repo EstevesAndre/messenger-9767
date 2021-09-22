@@ -61,7 +61,8 @@ router.get("/", async (req, res, next) => {
       }
 
       // Sort the messages by latest last
-      convoJSON.messages.sort((a, b) => Date.parse(a.createdAt) - Date.parse(b.createdAt));
+      // convoJSON.messages.sort((a, b) => Date.parse(a.createdAt) - Date.parse(b.createdAt));
+      convoJSON.messages.sort((a, b) => a.createdAt - b.createdAt);
 
       // set property for online status of the other user
       if (onlineUsers.includes(convoJSON.otherUser.id)) {
@@ -69,6 +70,22 @@ router.get("/", async (req, res, next) => {
       } else {
         convoJSON.otherUser.online = false;
       }
+
+      // get index of the last message seen by each user
+      var senderRead = -1, userRead = -1;
+      for (var j = 0; j < convoJSON.messages.length; j++) {
+        const msgId = convoJSON.messages[j].id;
+        if (convoJSON.otherUser.id === convoJSON.messages[j].senderId) { // Other user message
+          convoJSON.messages[j].isRead ? userRead = j : senderRead = msgId;
+        } else { // this user message
+          convoJSON.messages[j].isRead ? senderRead = msgId : userRead = j;
+        }
+      }
+
+      convoJSON.readIds = {
+        userMessagesToRead: userRead === -1 ? convoJSON.messages.length : convoJSON.messages.length - (userRead + 1),
+        otherUserLastMessageReadIndex: senderRead
+      };
 
       // set properties for notification count and latest message preview
       convoJSON.latestMessageText = convoJSON.messages[convoJSON.messages.length - 1].text;
