@@ -4,10 +4,11 @@ import { makeStyles } from "@material-ui/core/styles";
 import { connect } from "react-redux";
 import { postMessage } from "../../store/utils/thunkCreators";
 
-const useStyles = makeStyles(() => ({
+const useStyles = makeStyles((theme) => ({
   root: {
     justifySelf: "flex-end",
-    marginTop: 15
+    marginTop: theme.spacing(2),
+    height: '90px',
   },
   input: {
     height: 70,
