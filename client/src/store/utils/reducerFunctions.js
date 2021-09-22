@@ -11,10 +11,7 @@ export const addMessageToStore = (state, payload) => {
     return [newConvo, ...state];
   }
 
-  return [
-    state.splice(state.findIndex(a => a.id === message.conversationId), 1)[0],
-    ...state
-  ].map((convo) => {
+  return state.map((convo) => {
     if (convo.id === message.conversationId) {
       const convoCopy = { ...convo };
       convoCopy.messages.push(message);
@@ -73,10 +70,7 @@ export const addSearchedUsersToStore = (state, users) => {
 export const addNewConvoToStore = (state, recipientId, message) => {
 
   // Add updated conversation to the end of the array
-  return [
-    state.splice(state.findIndex(a => a.otherUser.id === recipientId), 1)[0],
-    ...state
-  ].map((convo) => {
+  return state.map((convo) => {
     if (convo.otherUser.id === recipientId) {
       const convoCopy = { ...convo };
       convoCopy.id = message.conversationId;
