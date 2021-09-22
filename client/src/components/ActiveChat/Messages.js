@@ -14,7 +14,7 @@ const useStyles = makeStyles(theme => ({
 
 const Messages = (props) => {
   const classes = useStyles();
-  const { messages, otherUser, userId } = props;
+  const { messages, otherUser, userId, otherUserLastMessageReadIndex } = props;
 
   return (
     <Box className={classes.messagesBox}>
@@ -22,9 +22,9 @@ const Messages = (props) => {
         const time = moment(message.createdAt).format("h:mm");
 
         return message.senderId === userId ? (
-          <SenderBubble key={message.id} text={message.text} time={time} />
+          <SenderBubble key={message.id} text={message.text} time={time} otherUser={otherUser} isLastMessageRead={otherUserLastMessageReadIndex === message.id} />
         ) : (
-          <OtherUserBubble key={message.id} text={message.text} time={time} otherUser={otherUser} />
+          <OtherUserBubble key={message.id} text={message.text} time={time} otherUser={otherUser} isLastMessageRead={otherUserLastMessageReadIndex === message.id} />
         );
       })}
     </Box>

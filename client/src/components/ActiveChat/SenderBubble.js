@@ -1,8 +1,8 @@
 import React from "react";
 import { makeStyles } from "@material-ui/core/styles";
-import { Box, Typography } from "@material-ui/core";
+import { Box, Typography, Avatar } from "@material-ui/core";
 
-const useStyles = makeStyles(() => ({
+const useStyles = makeStyles((theme) => ({
   root: {
     display: "flex",
     flexDirection: "column",
@@ -13,6 +13,13 @@ const useStyles = makeStyles(() => ({
     color: "#BECCE2",
     fontWeight: "bold",
     marginBottom: 5
+  },
+  avatarMini: {
+    height: 20,
+    width: 20,
+    marginTop: theme.spacing(0.5),
+    marginBottom: theme.spacing(2),
+    alignSelf: 'flex-end'
   },
   text: {
     fontSize: 14,
@@ -29,13 +36,16 @@ const useStyles = makeStyles(() => ({
 
 const SenderBubble = (props) => {
   const classes = useStyles();
-  const { time, text } = props;
+  const { time, text, otherUser, isLastMessageRead } = props;
+  console.log(props);
   return (
     <Box className={classes.root}>
       <Typography className={classes.date}>{time}</Typography>
       <Box className={classes.bubble}>
         <Typography className={classes.text}>{text}</Typography>
       </Box>
+      {isLastMessageRead && <Avatar alt={otherUser.username} src={otherUser.photoUrl} className={classes.avatarMini}></Avatar>}
+
     </Box>
   );
 };
