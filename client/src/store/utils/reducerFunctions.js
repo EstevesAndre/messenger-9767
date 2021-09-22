@@ -1,5 +1,5 @@
 export const addMessageToStore = (state, payload) => {
-  const { message, sender } = payload;
+  const { message, recipientId, sender } = payload;
   // if sender isn't null, that means the message needs to be put in a brand new convo
   if (sender !== null) {
     const newConvo = {
@@ -11,11 +11,14 @@ export const addMessageToStore = (state, payload) => {
     return [newConvo, ...state];
   }
 
+  // console.log(message, recipientId, sender);
   return state.map((convo) => {
     if (convo.id === message.conversationId) {
       const convoCopy = { ...convo };
       convoCopy.messages.push(message);
       convoCopy.latestMessageText = message.text;
+
+      // TODO update messages to Read
       return convoCopy;
     } else {
       return convo;
@@ -76,6 +79,26 @@ export const addNewConvoToStore = (state, recipientId, message) => {
       convoCopy.id = message.conversationId;
       convoCopy.messages.push(message);
       convoCopy.latestMessageText = message.text;
+      return convoCopy;
+    } else {
+      return convo;
+    }
+  });
+};
+
+export const updateConversationReadToStore = (state, payload) => {
+  const { conversationId, messageId, senderId } = payload;
+
+  // Updates the userMessagesToRead (to zero)
+  // Updates the otherUserLastMessageReadIndex for socket broadcast
+  // There is no need to update the messages since they are the same
+  return state.map((convo) => {
+    if (convo.id === conversationId) {
+      const convoCopy = { ...convo };
+      if (senderId !== null && senderId !== convoCopy.otherUser.id)
+        convoCopy.readIds.otherUserLastMessageReadIndex = messageId;
+      else
+        convoCopy.readIds.userMessagesToRead = 0;
       return convoCopy;
     } else {
       return convo;
