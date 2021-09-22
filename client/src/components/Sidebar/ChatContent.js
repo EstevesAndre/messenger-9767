@@ -42,7 +42,8 @@ const ChatContent = (props) => {
   const classes = useStyles();
 
   const { conversation } = props;
-  const { latestMessageText, otherUser, readIds: { userMessagesToRead } } = conversation;
+  const { latestMessageText, otherUser } = conversation;
+  const userMessagesToRead = conversation?.readIds?.userMessagesToRead || 0;
 
   return (
     <Box className={classes.root}>
