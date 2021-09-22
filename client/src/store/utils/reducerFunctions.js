@@ -11,14 +11,19 @@ export const addMessageToStore = (state, payload) => {
     return [newConvo, ...state];
   }
 
+  // Add updated conversation to the start of the array
+  // If we use push it will be added to the end of the array -> last element of chat users
+  state.unshift(
+    state.splice(
+      state.findIndex(a => a.id === message.conversationId),
+      1)[0]
+  );
+
   return state
-    .sort((a, b) => {
-      return a.id === message.conversationId ? -1 : b.id === message.conversationId ? 1 : 0;
-    })
     .map((convo) => {
       if (convo.id === message.conversationId) {
         const convoCopy = { ...convo };
-        convoCopy.messages.unshift(message);
+        convoCopy.messages.push(message);
         convoCopy.latestMessageText = message.text;
         return convoCopy;
       } else {
@@ -72,15 +77,20 @@ export const addSearchedUsersToStore = (state, users) => {
 };
 
 export const addNewConvoToStore = (state, recipientId, message) => {
+
+  // Add updated conversation to the end of the array
+  state.unshift(
+    state.splice(
+      state.findIndex(a => a.otherUser.id === recipientId),
+      1)[0]
+  );
+
   return state
-    .sort((a, b) => {
-      return a.otherUser.id === recipientId ? -1 : b.otherUser.id === recipientId ? 1 : 0;
-    })
     .map((convo) => {
       if (convo.otherUser.id === recipientId) {
         const convoCopy = { ...convo };
         convoCopy.id = message.conversationId;
-        convoCopy.messages.unshift(message);
+        convoCopy.messages.push(message);
         convoCopy.latestMessageText = message.text;
         return convoCopy;
       } else {
