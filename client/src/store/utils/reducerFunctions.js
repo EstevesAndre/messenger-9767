@@ -6,6 +6,10 @@ export const addMessageToStore = (state, payload) => {
       id: message.conversationId,
       otherUser: sender,
       messages: [message],
+      readIds: {
+        userMessagesToRead: 1,
+        otherUserLastMessageReadIndex: message.id,
+      }
     };
     newConvo.latestMessageText = message.text;
     return [newConvo, ...state];
@@ -83,6 +87,12 @@ export const addNewConvoToStore = (state, recipientId, message) => {
       const convoCopy = { ...convo };
       convoCopy.id = message.conversationId;
       convoCopy.messages.push(message);
+
+      convoCopy.readIds = {
+        userMessagesToRead: 0,
+        otherUserLastMessageReadIndex: -1,
+      };
+
       convoCopy.latestMessageText = message.text;
       return convoCopy;
     } else {
