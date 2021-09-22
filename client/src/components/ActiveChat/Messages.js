@@ -4,12 +4,10 @@ import { Box } from "@material-ui/core";
 import { SenderBubble, OtherUserBubble } from "../ActiveChat";
 import moment from "moment";
 
-const useStyles = makeStyles(() => ({
+const useStyles = makeStyles(theme => ({
   messagesBox: {
-    display: "flex",
-    flexDirection: "column-reverse",
     height: 'calc(100% - 90px)',
-    paddingRight: '1rem',
+    paddingRight: theme.spacing(2),
     overflowY: 'scroll',
   }
 }));
