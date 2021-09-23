@@ -37,7 +37,6 @@ const useStyles = makeStyles((theme) => ({
 
 const ChatContent = (props) => {
 
-  // userMessagesToRead !== 0 ? classes.textBold : "")}
   const classes = useStyles({
     textColor: props.messagesToRead === 0 ? "#9CADC8" : "black",
     fontWeight: props.messagesToRead === 0 ? "normal" : "bold",
