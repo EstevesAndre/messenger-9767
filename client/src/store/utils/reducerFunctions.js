@@ -7,8 +7,8 @@ export const addMessageToStore = (state, payload) => {
       otherUser: sender,
       messages: [message],
       readIds: {
-        userMessagesToRead: 1,
-        otherUserLastMessageReadIndex: message.id,
+        unreadMessagesCount: 1,
+        lastMessageReadId: message.id,
       }
     };
     newConvo.latestMessageText = message.text;
@@ -24,8 +24,8 @@ export const addMessageToStore = (state, payload) => {
       // update messages to read to recipient
       // Increments messages to read and updates otherUser last message index
       if (recipient !== null) {
-        convoCopy.readIds.userMessagesToRead++;
-        convoCopy.readIds.otherUserLastMessageReadIndex = message.id;
+        convoCopy.readIds.unreadMessagesCount++;
+        convoCopy.readIds.lastMessageReadId = message.id;
       }
 
       return convoCopy;
@@ -89,8 +89,8 @@ export const addNewConvoToStore = (state, recipientId, message) => {
       convoCopy.messages.push(message);
 
       convoCopy.readIds = {
-        userMessagesToRead: 0,
-        otherUserLastMessageReadIndex: -1,
+        unreadMessagesCount: 0,
+        lastMessageReadId: -1,
       };
 
       convoCopy.latestMessageText = message.text;
@@ -104,17 +104,17 @@ export const addNewConvoToStore = (state, recipientId, message) => {
 export const updateConversationReadToStore = (state, payload) => {
   const { conversationId, senderId } = payload;
 
-  // Updates the userMessagesToRead
-  // Updates the otherUserLastMessageReadIndex for socket broadcast
+  // Updates the unreadMessagesCount 
+  // Updates the lastMessageReadId  for socket broadcast
   // There is no need to update the messages since they are the same
   return state.map((convo) => {
     if (convo.id === conversationId) {
       const convoCopy = { ...convo };
 
       if (senderId !== null && senderId !== convoCopy.otherUser.id)
-        convoCopy.readIds.otherUserLastMessageReadIndex = convoCopy.messages[convoCopy.messages.length - 1].id;
+        convoCopy.readIds.lastMessageReadId = convoCopy.messages[convoCopy.messages.length - 1].id;
       else
-        convoCopy.readIds.userMessagesToRead = 0;
+        convoCopy.readIds.unreadMessagesCount = 0;
       return convoCopy;
     } else {
       return convo;
