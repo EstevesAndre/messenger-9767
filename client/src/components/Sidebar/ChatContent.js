@@ -17,12 +17,9 @@ const useStyles = makeStyles((theme) => ({
   },
   previewText: {
     fontSize: 12,
-    color: "#9CADC8",
+    color: (props) => props.textColor,
+    fontWeight: (props) => props.fontWeight,
     letterSpacing: -0.17,
-  },
-  textBold: {
-    fontWeight: 'bold',
-    color: "black",
   },
   badge: {
     backgroundColor: theme.palette.primary.main,
@@ -39,11 +36,15 @@ const useStyles = makeStyles((theme) => ({
 }));
 
 const ChatContent = (props) => {
-  const classes = useStyles();
 
-  const { conversation } = props;
+  // userMessagesToRead !== 0 ? classes.textBold : "")}
+  const classes = useStyles({
+    textColor: props.messagesToRead === 0 ? "#9CADC8" : "black",
+    fontWeight: props.messagesToRead === 0 ? "normal" : "bold",
+  });
+
+  const { conversation, messagesToRead } = props;
   const { latestMessageText, otherUser } = conversation;
-  const userMessagesToRead = conversation?.readIds?.userMessagesToRead || 0;
 
   return (
     <Box className={classes.root}>
@@ -51,14 +52,14 @@ const ChatContent = (props) => {
         <Typography className={classes.username}>
           {otherUser.username}
         </Typography>
-        <Typography className={classes.previewText + " " + (userMessagesToRead !== 0 ? classes.textBold : "")}>
+        <Typography className={classes.previewText}>
           {latestMessageText}
         </Typography>
       </Box>
-      {userMessagesToRead !== 0 &&
+      {messagesToRead !== 0 &&
         <Box>
           <Typography className={classes.badge}>
-            {userMessagesToRead}
+            {messagesToRead}
           </Typography>
         </Box>
       }
