@@ -49,7 +49,7 @@ const OtherUserBubble = (props) => {
 
   return (
     <Box className={classes.root}>
-      <Avatar alt={otherUser.username} src={otherUser.photoUrl} className={classes.avatar}></Avatar>
+      <Avatar alt={otherUser.username} src={otherUser.photoUrl} className={classes.avatar} />
       <Box className={classes.body}>
         <Typography className={classes.usernameDate}>
           {otherUser.username} {time}
@@ -58,7 +58,7 @@ const OtherUserBubble = (props) => {
           <Typography className={classes.text}>{text}</Typography>
         </Box>
       </Box>
-      {isLastMessageRead && <Avatar alt={otherUser.username} src={otherUser.photoUrl} className={classes.avatarMini}></Avatar>}
+      {isLastMessageRead && <Avatar alt={otherUser.username} src={otherUser.photoUrl} className={classes.avatarMini} />}
     </Box>
   );
 };
