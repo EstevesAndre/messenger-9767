@@ -94,7 +94,6 @@ router.get("/", async (req, res, next) => {
       }
 
       // Sort the messages by latest last
-      // convoJSON.messages.sort((a, b) => Date.parse(a.createdAt) - Date.parse(b.createdAt));
       convoJSON.messages.sort((a, b) => a.createdAt - b.createdAt);
 
       // set property for online status of the other user
