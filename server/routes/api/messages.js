@@ -43,4 +43,40 @@ router.post("/", async (req, res, next) => {
   }
 });
 
+// updates conversation messages on read
+router.put("/read", async (req, res, next) => {
+  try {
+    if (!req.user) {
+      return res.sendStatus(401);
+    }
+
+    const senderId = req.user.id;
+    const { conversationId, otherUserId } = req.body;
+
+    const conversation = await Conversation.findByPk(conversationId);
+
+    if (conversation) {
+      if (conversation.user1Id !== senderId && conversation.user2Id !== senderId)
+        return res.sendStatus(403);
+    }
+    else return res.sendStatus(404);
+
+    const messagesRead = await Message.update({ isRead: true }, {
+      where: {
+        conversationId: conversationId,
+        senderId: otherUserId,
+        isRead: false
+      }
+    });
+
+    return res.status(200).json({
+      conversationId,
+      senderId: otherUserId,
+      messagesRead,
+    });
+  } catch (error) {
+    next(error);
+  }
+});
+
 module.exports = router;

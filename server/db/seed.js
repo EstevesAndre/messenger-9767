@@ -32,6 +32,7 @@ async function seed() {
     conversationId: santaigoConvo.id,
     senderId: santiago.id,
     text: "Where are you from?",
+    isRead: true
   });
   await Message.create({
     conversationId: santaigoConvo.id,
@@ -61,6 +62,19 @@ async function seed() {
     text: "Sure! What time?",
   });
 
+  await Message.create({
+    conversationId: chiumboConvo.id,
+    senderId: thomas.id,
+    text: "9:00PM",
+    isRead: true,
+  });
+
+  await Message.create({
+    conversationId: chiumboConvo.id,
+    senderId: thomas.id,
+    text: "No, sorry! 10:00PM please!",
+  });
+
   const hualing = await User.create({
     username: "hualing",
     email: "hualing@email.com",
@@ -77,6 +91,7 @@ async function seed() {
     await Message.create({
       conversationId: hualingConvo.id,
       senderId: hualing.id,
+      isRead: i < 6,
       text: "a test message",
     });
   }

@@ -3,6 +3,76 @@ const { User, Conversation, Message } = require("../../db/models");
 const { Op } = require("sequelize");
 const onlineUsers = require("../../onlineUsers");
 
+const getUserUnreadCount = (messages, otherUserId) => {
+
+  // start from last to the beginning (more efficient)
+  for (let index = messages.length - 1; index >= 0; index--) {
+    const msg = messages[index];
+
+    if (otherUserId === msg.senderId) {
+      if (msg.isRead) return messages.length - (index + 1);
+    } else return messages.length - (index + 1);
+  }
+
+  return messages.length;
+};
+
+const getOtherUserLastMessageReadId = (messages, otherUserId) => {
+
+  // start from last to the beginning (more efficient)
+  for (let index = messages.length - 1; index >= 0; index--) {
+    const msg = messages[index];
+
+    // To prevent lookup for the rest of the conversation 
+    // (if sender writes a message it should me considered that he read everything that is above)
+    if (otherUserId === msg.senderId) return null;
+    else {
+      // last message read
+      if (msg.isRead) return msg.id;
+    }
+  }
+
+  return null;
+};
+
+const getReadInformation = (otherUserId, messages) => {
+
+  let senderRead = -1, userRead = -1;
+
+  const setUserUnreadCount = (newValue) => {
+    userRead = (userRead === -1 ? newValue : userRead);
+  };
+  const setSenderReadId = (newId) => {
+    senderRead = (senderRead === -1 ? newId : senderRead);
+  };
+
+  // start from last to the beginning (more efficient)
+  for (let index = messages.length - 1; j >= 0; j--) {
+    const msg = messages[j];
+
+    // Other user message
+    if (otherUserId === msg.senderId) {
+      if (msg.isRead) setUserUnreadCount(j);
+
+      // To prevent lookup for the rest of the conversation 
+      // (if sender writes a message it should me considered that he read everything that is above)
+      setSenderReadId(null);
+    }
+    // this user message
+    else {
+      if (msg.isRead) setSenderReadId(msg.id);
+      setUserUnreadCount(j);
+    }
+
+    if (senderRead !== -1 && userRead !== -1) break;
+  }
+
+  return {
+    unreadMessagesCount: userRead === -1 ? messages.length : messages.length - (userRead + 1),
+    lastMessageReadId: senderRead
+  };
+};
+
 // get all conversations for a user, include latest message text for preview, and all messages
 // include other user model so we have info on username/profile pic (don't include current user info)
 router.get("/", async (req, res, next) => {
@@ -61,7 +131,7 @@ router.get("/", async (req, res, next) => {
       }
 
       // Sort the messages by latest last
-      convoJSON.messages.sort((a, b) => Date.parse(a.createdAt) - Date.parse(b.createdAt));
+      convoJSON.messages.sort((a, b) => a.createdAt - b.createdAt);
 
       // set property for online status of the other user
       if (onlineUsers.includes(convoJSON.otherUser.id)) {
@@ -69,6 +139,12 @@ router.get("/", async (req, res, next) => {
       } else {
         convoJSON.otherUser.online = false;
       }
+
+      // get index of the last message seen by each user
+      convoJSON.readIds = {
+        unreadMessagesCount: getUserUnreadCount(convoJSON.messages, convoJSON.otherUser.id),
+        lastMessageReadId: getOtherUserLastMessageReadId(convoJSON.messages, convoJSON.otherUser.id)
+      };
 
       // set properties for notification count and latest message preview
       convoJSON.latestMessageText = convoJSON.messages[convoJSON.messages.length - 1].text;
