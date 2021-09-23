@@ -43,4 +43,30 @@ router.post("/", async (req, res, next) => {
   }
 });
 
+// updates conversation messages on read
+router.put("/read", async (req, res, next) => {
+  try {
+    if (!req.user) {
+      return res.sendStatus(401);
+    }
+    const { conversationId, otherUserId } = req.body;
+
+    const messagesRead = await Message.update({ isRead: true }, {
+      where: {
+        conversationId: conversationId,
+        senderId: otherUserId,
+        isRead: false
+      }
+    });
+
+    return res.status(200).json({
+      conversationId,
+      senderId: otherUserId,
+      messagesRead
+    });
+  } catch (error) {
+    next(error);
+  }
+});
+
 module.exports = router;

@@ -11,29 +11,35 @@ const getReadIds = (otherUserId, messages) => {
   const setUserReadValue = (j) => {
     userRead = (userRead === -1 ? j : userRead);
   };
-  const setSenderReadValue = (msgId) => {
-    senderRead = (senderRead === -1 ? msgId : senderRead);
+  const setSenderReadValue = (j) => {
+    senderRead = (senderRead === -1 ? j : senderRead);
   };
 
   // start from last to the beginning (more efficient)
   for (var j = messages.length - 1; j >= 0; j--) {
-    const msgId = messages[j].id;
+    const msg = messages[j];
 
     // Other user message
-    if (otherUserId === messages[j].senderId) {
-      if (messages[j].isRead) setUserReadValue(j);
-      setSenderReadValue(msgId);
+    if (otherUserId === msg.senderId) {
+      if (msg.isRead) setUserReadValue(j);
+
+      // To prevent lookup for the rest of the conversation 
+      // (if sender writes a message it should me considered that he read everything that is above)
+      setSenderReadValue(-2);
     }
     // this user message
     else {
-      if (messages[j].isRead) setSenderReadValue(msgId);
+      if (msg.isRead) setSenderReadValue(msg.id);
       setUserReadValue(j);
     }
 
     if (senderRead !== -1 && userRead !== -1) break;
   }
 
-  return { senderRead, userRead };
+  return {
+    userMessagesToRead: userRead === -1 ? messages.length : messages.length - (userRead + 1),
+    otherUserLastMessageReadIndex: senderRead
+  };
 };
 
 // get all conversations for a user, include latest message text for preview, and all messages
@@ -104,12 +110,7 @@ router.get("/", async (req, res, next) => {
       }
 
       // get index of the last message seen by each user
-      const { senderRead, userRead } = getReadIds(convoJSON.otherUser.id, convoJSON.messages);
-
-      convoJSON.readIds = {
-        userMessagesToRead: userRead === -1 ? convoJSON.messages.length : convoJSON.messages.length - (userRead + 1),
-        otherUserLastMessageReadIndex: senderRead
-      };
+      convoJSON.readIds = getReadIds(convoJSON.otherUser.id, convoJSON.messages);
 
       // set properties for notification count and latest message preview
       convoJSON.latestMessageText = convoJSON.messages[convoJSON.messages.length - 1].text;
@@ -117,36 +118,6 @@ router.get("/", async (req, res, next) => {
     }
 
     res.json(conversations);
-  } catch (error) {
-    next(error);
-  }
-});
-
-// updates read conversation
-router.put("/read/:id", async (req, res, next) => {
-  try {
-    if (!req.user) {
-      return res.sendStatus(401);
-    }
-
-    const conversationId = req.params.id;
-
-    const conversation = await Conversation.findOne({
-      where: {
-        id: conversationId
-      },
-      attributes: ["id"],
-      include: [
-        { model: Message, limit: 1, order: [['createdAt', 'DESC']] }
-      ]
-    });
-
-    if (conversation.messages.length && !conversation.messages[0].isRead) {
-      conversation.messages[0].isRead = true;
-      conversation.messages[0].save();
-    }
-
-    return res.status(200).json(conversation.messages[0]);
   } catch (error) {
     next(error);
   }
