@@ -73,12 +73,12 @@ export const addConversation = (recipientId, newMessage) => {
   };
 };
 
-export const setConversationRead = (conversationId, messageId, senderId) => {
+export const setConversationRead = (conversationId, messagesRead, senderId) => {
   return {
     type: SET_CONVERSATION_READ,
     payload: {
       conversationId,
-      messageId: messageId || null,
+      messagesRead: messagesRead || null,
       senderId: senderId || null
     },
   };

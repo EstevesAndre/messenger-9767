@@ -102,16 +102,17 @@ export const addNewConvoToStore = (state, recipientId, message) => {
 };
 
 export const updateConversationReadToStore = (state, payload) => {
-  const { conversationId, messageId, senderId } = payload;
+  const { conversationId, senderId } = payload;
 
-  // Updates the userMessagesToRead (to zero)
+  // Updates the userMessagesToRead
   // Updates the otherUserLastMessageReadIndex for socket broadcast
   // There is no need to update the messages since they are the same
   return state.map((convo) => {
     if (convo.id === conversationId) {
       const convoCopy = { ...convo };
+
       if (senderId !== null && senderId !== convoCopy.otherUser.id)
-        convoCopy.readIds.otherUserLastMessageReadIndex = messageId;
+        convoCopy.readIds.otherUserLastMessageReadIndex = convoCopy.messages[convoCopy.messages.length - 1].id;
       else
         convoCopy.readIds.userMessagesToRead = 0;
       return convoCopy;

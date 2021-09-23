@@ -79,17 +79,13 @@ export const fetchConversations = () => async (dispatch) => {
   }
 };
 
-export const conversationRead = (conversationId) => async (dispatch) => {
+export const conversationRead = (body) => async (dispatch) => {
   try {
-    const { data } = await axios.put(`/api/conversations/read/${conversationId}`);
+    const { data } = await axios.put("/api/messages/read", body);
 
     dispatch(setConversationRead(data.conversationId));
 
-    socket.emit("conversation-read", {
-      conversationId: data.conversationId,
-      messageId: data.id,
-      senderId: data.senderId
-    });
+    socket.emit("conversation-read", data);
   } catch (error) {
     console.error(error);
   }
