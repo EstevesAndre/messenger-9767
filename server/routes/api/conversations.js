@@ -35,44 +35,6 @@ const getOtherUserLastMessageReadId = (messages, otherUserId) => {
   return null;
 };
 
-const getReadInformation = (otherUserId, messages) => {
-
-  let senderRead = -1, userRead = -1;
-
-  const setUserUnreadCount = (newValue) => {
-    userRead = (userRead === -1 ? newValue : userRead);
-  };
-  const setSenderReadId = (newId) => {
-    senderRead = (senderRead === -1 ? newId : senderRead);
-  };
-
-  // start from last to the beginning (more efficient)
-  for (let index = messages.length - 1; j >= 0; j--) {
-    const msg = messages[j];
-
-    // Other user message
-    if (otherUserId === msg.senderId) {
-      if (msg.isRead) setUserUnreadCount(j);
-
-      // To prevent lookup for the rest of the conversation 
-      // (if sender writes a message it should me considered that he read everything that is above)
-      setSenderReadId(null);
-    }
-    // this user message
-    else {
-      if (msg.isRead) setSenderReadId(msg.id);
-      setUserUnreadCount(j);
-    }
-
-    if (senderRead !== -1 && userRead !== -1) break;
-  }
-
-  return {
-    unreadMessagesCount: userRead === -1 ? messages.length : messages.length - (userRead + 1),
-    lastMessageReadId: senderRead
-  };
-};
-
 // get all conversations for a user, include latest message text for preview, and all messages
 // include other user model so we have info on username/profile pic (don't include current user info)
 router.get("/", async (req, res, next) => {
