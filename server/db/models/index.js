@@ -7,6 +7,7 @@ const { Conversation, UserConversation } = require("./conversation");
 // many to many relation between user & conversation
 User.belongsToMany(Conversation, { through: UserConversation });
 Conversation.belongsToMany(User, { through: UserConversation });
+
 Message.belongsTo(Conversation);
 Conversation.hasMany(Message);
 

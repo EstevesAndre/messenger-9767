@@ -11,19 +11,14 @@ const Conversation = db.define("conversation", {
   }
 });
 
+// Through table
 const UserConversation = db.define("user_conversation", {});
 
-// find conversation given two user Ids
-
-Conversation.findConversation = async function (user1Id, user2Id) {
+// find conversation given conversation name
+Conversation.findConversation = async function (name) {
   const conversation = await Conversation.findOne({
     where: {
-      user1Id: {
-        [Op.or]: [user1Id, user2Id]
-      },
-      user2Id: {
-        [Op.or]: [user1Id, user2Id]
-      }
+      name: name
     }
   });
 
