@@ -1,20 +1,37 @@
-const { Op } = require("sequelize");
+const { Op, Sequelize } = require("sequelize");
 const db = require("../db");
 const Message = require("./message");
 
-const Conversation = db.define("conversation", {});
+const Conversation = db.define("conversation", {
+  // user that created the conversation (to prevent conversation with the same name)
+  userId: {
+    type: Sequelize.INTEGER,
+    allowNull: false,
+  },
+  // for conversations 1-1 the name can be username1_username2 or user1Id_user2Id
+  // for group messages the name can be set
+  name: {
+    type: Sequelize.STRING,
+    allowNull: false,
+  }
+});
 
-// find conversation given two user Ids
+// Through table
+const UserConversation = db.define("user_conversation", {
+  lastMessageReadId: {
+    type: Sequelize.INTEGER,
+    allowNull: false,
+    defaultValue: null,
+  }
+});
 
-Conversation.findConversation = async function (user1Id, user2Id) {
+// find conversation given conversation userId and name
+Conversation.findConversation = async function (userId, name, creationDate) {
   const conversation = await Conversation.findOne({
     where: {
-      user1Id: {
-        [Op.or]: [user1Id, user2Id]
-      },
-      user2Id: {
-        [Op.or]: [user1Id, user2Id]
-      }
+      userId: userId,
+      name: name,
+      createdAt: creationDate,
     }
   });
 
@@ -22,4 +39,4 @@ Conversation.findConversation = async function (user1Id, user2Id) {
   return conversation;
 };
 
-module.exports = Conversation;
+module.exports = { Conversation, UserConversation };
