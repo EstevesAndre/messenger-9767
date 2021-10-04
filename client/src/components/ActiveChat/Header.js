@@ -21,7 +21,8 @@ const useStyles = makeStyles((theme) => ({
     fontSize: 20,
     letterSpacing: -0.29,
     fontWeight: "bold",
-    marginRight: 14
+    marginRight: 14,
+    textTransform: 'capitalize'
   },
   statusText: {
     fontSize: 12,

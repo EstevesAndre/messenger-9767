@@ -14,6 +14,7 @@ const useStyles = makeStyles((theme) => ({
   username: {
     fontWeight: "bold",
     letterSpacing: -0.2,
+    textTransform: 'capitalize'
   },
   previewText: {
     fontSize: 12,
